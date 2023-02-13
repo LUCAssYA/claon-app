@@ -19,6 +19,7 @@ import {
   useFindHoldInfoByCenter,
   useSearchCenterName,
 } from 'climbingweb/src/hooks/queries/center/queryKey';
+import { useRouter } from 'next/router';
 
 export default function CreatePostPage() {
   const [page, setPage] = useState<string>('first');
@@ -29,11 +30,21 @@ export default function CreatePostPage() {
   const [searchInput, setSearchInput] = useState<string>('');
   const [selected, setSelected] = useState(false);
   const { data: centerList } = useSearchCenterName(searchInput);
+  const router = useRouter();
 
   //기준이 되는 hold 리스트 state
   const { data: holdListData } = useFindHoldInfoByCenter(postData.centerId);
 
-  const { isLoading } = useCreatePost();
+  const { isLoading } = useCreatePost({
+    onSuccess: () => {
+      alert('입력 완료 되었습니다.');
+      router.push('/');
+    },
+    onError: () => {
+      alert('피드 작성에 실패했습니다. 다시 시도해주세요.');
+      window.location.reload();
+    },
+  });
   const { mutate: getPostContentsList, isLoading: getPostContentsListLoading } =
     useGetPostContentsList();
 
@@ -122,22 +133,33 @@ export default function CreatePostPage() {
             onSubmit={page === 'second' ? handlePostDataSubmit : null}
           />
         }
+        className="pl-[20px] pr-[18px] text-base items-center"
       />
       <div className="p-4">
         {page === 'first' ? (
           <div className="flex flex-col gap-4">
-            <PageSubTitle title={'사진'} />
+            <PageSubTitle
+              title={'사진'}
+              className="px-[4px] text-base font-bold"
+            />
             <UploadImageList />
-            <PageSubTitle title={'내용'} />
+            <PageSubTitle
+              title={'내용'}
+              className="px-[4px] text-base font-bold"
+            />
             <TextArea
               data={postData.content}
               setData={handleContentInput}
               placeholder="500자 이내 글 입력"
+              className="w-[89vw] h-[32.4vh] ml-[4px] mr-[4px]"
             />
           </div>
         ) : (
           <div className="flex flex-col gap-4">
-            <PageSubTitle title={'암장 이름'} />
+            <PageSubTitle
+              title={'암장 이름'}
+              className="px-[4px] text-base font-bold"
+            />
             <CenterSearchInput
               refObj={searchInputRef}
               selected={selected}
@@ -146,8 +168,12 @@ export default function CreatePostPage() {
               initialValue={searchInput}
               centerList={centerList}
               onChange={handleSearchInputChange}
+              className="px-[4px] min-h-[52px]"
             />
-            <PageSubTitle title={'완등 횟수'} />
+            <PageSubTitle
+              title={'완등 횟수'}
+              className="px-[4px] text-base font-bold"
+            />
             <HoldListModal
               maxCount={10}
               centerId={postData.centerId}
