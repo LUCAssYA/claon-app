@@ -15,6 +15,7 @@ import {
   useFindAllParentComment,
   useUpdateComment,
 } from 'climbingweb/src/hooks/queries/post/queryKey';
+import { useBnbHide } from 'climbingweb/src/hooks/useBnB';
 import { useIntersectionObserver } from 'climbingweb/src/hooks/useIntersectionObserver';
 import {
   CommentCreateRequest,
@@ -36,6 +37,8 @@ export default function CommentDetailPage() {
   const feedId = fid as string;
   const parentCommentId = cid as string;
 
+  useBnbHide();
+
   //바텀시트 open state
   const [openBTSheet, setOpenBTSheet] = useState<boolean>(false);
 
@@ -47,7 +50,7 @@ export default function CommentDetailPage() {
   });
 
   //댓글 수정 클릭 시 input focus 를 위한 ref
-  const commentInputRef = useRef<HTMLInputElement>(null);
+  const commentInputRef = useRef<HTMLTextAreaElement>(null);
 
   //현재 대댓글 페이지의 부모 댓글을 api 에서 지원하지 않기 때문에 따로 가져옴
   const {
@@ -96,9 +99,14 @@ export default function CommentDetailPage() {
   };
 
   //댓글 수정 클릭 핸들러
-  const handleModifyCommentClick = (commentId: string) => {
-    setSelectedComment({ ...selectedComment, commentId, isEdit: true });
-    commentInputRef.current?.focus();
+  const handleModifyCommentClick = (commentId: string, content: string) => {
+    const commentInput = commentInputRef.current;
+    if (commentInput) {
+      setSelectedComment({ ...selectedComment, commentId, isEdit: true });
+      commentInput.value = content;
+      commentInput.dispatchEvent(new Event('change', { bubbles: true }));
+      commentInput.focus();
+    }
   };
 
   //댓글 삭제 클릭 핸들러

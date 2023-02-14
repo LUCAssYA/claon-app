@@ -14,6 +14,7 @@ import {
   useFindAllParentComment,
   useUpdateComment,
 } from 'climbingweb/src/hooks/queries/post/queryKey';
+import { useBnbHide } from 'climbingweb/src/hooks/useBnB';
 import { useIntersectionObserver } from 'climbingweb/src/hooks/useIntersectionObserver';
 import {
   CommentCreateRequest,
@@ -34,6 +35,8 @@ export default function CommentPage() {
   const { fid } = router.query;
   const feedId = fid as string;
 
+  useBnbHide();
+
   //바텀시트 open state
   const [openBTSheet, setOpenBTSheet] = useState<boolean>(false);
 
@@ -45,7 +48,7 @@ export default function CommentPage() {
   });
 
   //댓글 수정 클릭 시 input focus 를 위한 ref
-  const commentInputRef = useRef<HTMLInputElement>(null);
+  const commentInputRef = useRef<HTMLTextAreaElement>(null);
 
   //현재 댓글 페이지의 댓글들을 가져옴
   const {
